@@ -2,6 +2,8 @@
 
 Este repositório contém a solução desenvolvida para o desafio de atendimento automatizado da **AtlasX Logística Integrada**. O bot foi construído na plataforma Blip utilizando uma arquitetura modular e integração com IA Generativa.
 
+Figma do projeto: https://www.figma.com/design/nBsnzRl35WjF88dRZU4Odz/AtlasX-Log%C3%ADstica-Integrada?node-id=0-1&t=SggnIv8b8aG9PBad-1
+
 ## 🏗️ Estrutura Modular
 O projeto foi desenhado seguindo as boas práticas da Blip, dividido em blocos lógicos para facilitar a manutenção e escalabilidade:
 * **Boas Vindas (BV):** Recepção e conformidade com LGPD.
