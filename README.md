@@ -1,123 +1,70 @@
-🤖 Atlas - Assistente de Logística AtlasX
-Este repositório contém a solução desenvolvida para o desafio de atendimento automatizado da AtlasX Logística Integrada. O bot foi construído na plataforma Blip utilizando uma arquitetura modular e integração com IA Generativa.
+# 🤖 Atlas - Assistente de Logística AtlasX
 
-🏗️ Estrutura Modular
-O projeto foi desenhado seguindo as boas práticas da Blip, dividido em blocos lógicos:
-Boas Vindas (BV): Recepção e conformidade com LGPD.
-Principal (P): Menu de decisão inicial.
-Identificação e Validação (IV): Motor de consulta de documentos (CPF/CNPJ) via API.
-Cadastro (C): Fluxo de coleta de dados assistido por IA.
-Apoio: Módulos de Transbordo, Inatividade, Pesquisa CSAT (pós-humano) e Cascata de Validação.
+Este repositório contém a solução desenvolvida para o desafio de atendimento automatizado da **AtlasX Logística Integrada**. O bot foi construído na plataforma Blip utilizando uma arquitetura modular e integração com IA Generativa.
 
-🧠 Decisões Arquiteturais
+## 🏗️ Estrutura Modular
+O projeto foi desenhado seguindo as boas práticas da Blip, dividido em blocos lógicos para facilitar a manutenção e escalabilidade:
+* [cite_start]**Boas Vindas (BV):** Recepção e conformidade com LGPD[cite: 4].
+* [cite_start]**Principal (P):** Menu de decisão inicial[cite: 7].
+* [cite_start]**Identificação e Validação (IV):** Motor de consulta de documentos (CPF/CNPJ) via API[cite: 16].
+* [cite_start]**Cadastro (C):** Fluxo de coleta de dados assistido por IA[cite: 57].
+* [cite_start]**Apoio:** Módulos de Transbordo, Inatividade, Pesquisa CSAT e Cascata de Validação[cite: 21, 56, 103, 89].
 
-IA Generativa (Groq - Llama 3): Utilizada para extração de entidades (endereço, nome, e-mail) de forma fluida, garantindo uma UX superior à coleta tradicional.
-Resiliência e Retry Policy: Implementação de até 3 retentativas automáticas em chamadas de API antes do redirecionamento para erro persistente.
-Tratamento de Erros: "Cascata de Validação" para lidar com inputs não suportados (áudio, imagens) e falhas de integração.
-Modelagem de Estados: Encerramento cíclico que reconduz o usuário ao início do fluxo, garantindo que o bot esteja sempre pronto para uma nova interação.
+## 🧠 Decisões Arquiteturais
+* [cite_start]**IA Generativa (Groq - Llama 3):** Utilizada no módulo de cadastro para extração de entidades (nome, e-mail, endereço) de forma fluida[cite: 61].
+* [cite_start]**Resiliência e Retry Policy:** Implementação de até 3 retentativas automáticas em chamadas de API antes do erro persistente[cite: 49].
+* [cite_start]**Tratamento de Erros:** "Cascata de Validação" para lidar com inputs não suportados (áudio, imagens) e falhas de integração[cite: 88].
+* [cite_start]**Modelagem de Estados:** Encerramento cíclico que reconduz o utilizador ao início, garantindo prontidão para novos atendimentos[cite: 93].
 
-📥 Como Importar o Projeto (Passo a Passo)
-Para garantir que o Atlas funcione com todas as suas funcionalidades (IA, menus dinâmicos e horários), siga rigorosamente a ordem abaixo:
+---
 
-1. Criação do Roteador
-No portal Blip, crie um novo contato inteligente do tipo Roteador.
+## 📥 Como Importar o Projeto (Passo a Passo)
 
-Nomeie como: Router - AtlasX.
+### 1. Criação do Roteador
+1. No portal Blip, crie um novo contato inteligente do tipo **Roteador**.
+2. Nomeie como: `Router - AtlasX`.
 
-2. Configuração de Recursos (Resources)
-Antes de importar o fluxo, você precisa configurar os "motores" do bot.
+### 2. Configuração de Recursos (Resources)
+Acesse o roteador -> **Configurações (...)** -> **Conteúdos** -> **Recursos**. Adicione:
+* **Chave:** `BotConfiguration` | **Tipo:** JSON | **Valor:** Conteúdo de `BotConfiguration.json`.
+* **Chave:** `functionGetMenu` | **Tipo:** Texto | **Valor:** Conteúdo de `functionGetMenu.txt`.
+* **Chave:** `ServiceScheduleRules` | **Tipo:** JSON | **Valor:** Conteúdo de `ServiceScheduleRules.json`.
 
-Acesse o seu roteador e clique no ícone de três pontos (...) no menu superior.
+### 3. Geração de Chaves e Connection URL
+Para que a orquestração funcione, você deve preencher o arquivo `BotConfiguration.json` com os dados abaixo antes de salvá-lo nos Recursos:
+1. **Chave do Roteador:** Em `Router - AtlasX` -> **Configurações** -> **Chaves de acesso** -> Gerar Nova Chave.
+2. **Connection URL:** Em `Router - AtlasX` -> **Configurações** -> **Informações de conexão** -> Copie a "URL para enviar comandos".
+3. **Chave do Transbordo:** No bot `Transbordo - AtlasX` -> **Configurações** -> **Chaves de acesso** -> Gerar Nova Chave.
 
-Selecione Conteúdos e, no menu lateral esquerdo, clique em Recursos.
+> **Dica:** Utilize um editor de código (como VS Code) para preencher o JSON e garantir que a sintaxe esteja correta.
 
-Adicione os 3 recursos abaixo exatamente com as mesmas chaves:
+### 4. Criação dos Bots Subordinados
+Crie **9 bots** do tipo Builder. Utilize os nomes abaixo (o bot de validação deve ser criado sem espaços devido ao limite de caracteres):
+* `Boas Vindas - AtlasX`
+* `Principal - AtlasX`
+* `IdentificaoeValidacao - AtlasX`
+* `Cadastro - AtlasX`
+* `Algo Mais - AtlasX`
+* `Transbordo - AtlasX`
+* `Pesquisa CSAT - AtlasX`
+* `Cascata de Validacao - AtlasX`
+* `Finalizacao - AtlasX`
 
-Chave: BotConfiguration
+### 5. Configuração e Publicação Individual
+Para cada um dos 9 bots:
+1. Acesse o **Builder** -> **Configurações** (engrenagem).
+2. Ative as chaves: **Tracking automático** e **Utilizar contexto do roteador**.
+3. Vá em **Versões** -> **Carregar fluxo** -> Selecione o arquivo JSON correspondente.
+4. Clique no ícone de foguete (**Publicar fluxo**) no menu lateral esquerdo para ativar.
 
-Tipo: JSON
-
-Valor: (Copie e cole o conteúdo do arquivo BotConfiguration.json disponível na pasta /json/resources deste repositório).
-
-Chave: functionGetMenu
-
-Tipo: Texto
-
-Valor: (Copie e cole o script disponível no arquivo functionGetMenu.txt).
-
-Chave: ServiceScheduleRules
-
-Tipo: JSON
-
-Valor: (Copie e cole as regras de horário contidas em ServiceScheduleRules.json).
-
-3. Criação dos Bots Subordinados
-Crie 9 bots do tipo "Builder" dentro do seu roteador. Para que as transferências de estado funcionem, utilize exatamente os nomes abaixo:
-
-
-Boas Vindas - AtlasX 
-
-
-Principal - AtlasX 
-
-
-IdentificaoeValidacao - AtlasX 
-
-
-Cadastro - AtlasX 
-
-
-Algo Mais - AtlasX 
-
-
-Transbordo - AtlasX 
-
-
-Pesquisa CSAT - AtlasX 
-
-
-Cascata de Validacao - AtlasX 
-
-
-Finalizacao - AtlasX 
-
-4. Importação do Fluxo (Tutorial para cada Bot)
-Para cada um dos 9 bots criados, realize o seguinte procedimento:
-
-Acesse o Builder do bot.
-
-Clique no ícone de Configurações (engrenagem no canto esquerdo da página).
-
-No menu lateral que será aberto à direita, ative as chaves:
-
-
-Tracking automático 
-
-
-Utilizar contexto do roteador 
-
-Ainda no menu lateral, clique na aba Versões.
-
-Clique em Carregar fluxo e selecione o arquivo JSON correspondente ao bot (ex: boas_vindas.json).
-
-Clique em Sim na janela de confirmação de sobreposição.
-
-Importante: Clique no botão Publicar fluxo no canto esquerdo (ícone de foguete) para salvar as alterações.
-
-5. Conexão dos Serviços ao Roteador (Router - AtlasX)
-Esta etapa interliga os módulos e define o Boas Vindas como a porta de entrada.
-
-Acesse o Router - AtlasX e clique em Serviços no menu superior.
-
-Clique em Adicionar um serviço para conectar cada bot individualmente.
-
-O nome de cada serviço deve ser preenchido exatamente conforme a lista abaixo para garantir que os redirecionamentos de estado funcionem:
+### 6. Conexão dos Serviços no Roteador
+No `Router - AtlasX`, acesse **Serviços** e conecte os bots seguindo esta tabela:
 
 | Serviço | Chatbot Correspondente | Configuração / Expiração |
 | :--- | :--- | :--- |
-| **boasVindas** | `Boas Vindas - AtlasX` | [cite_start]**Chatbot Principal** (Porta de entrada/LGPD) [cite: 1] |
+| **boasVindas** | `Boas Vindas - AtlasX` | **Chatbot Principal** |
 | **principal** | `Principal - AtlasX` | 86400 segundos |
-| **identificacaoValidacao** | `Identificacao e Validacao - AtlasX` | 86400 segundos |
+| **identificacaoValidacao** | `IdentificaoeValidacao - AtlasX` | 86400 segundos |
 | **cadastro** | `Cadastro - AtlasX` | 86400 segundos |
 | **algoMais** | `Algo Mais - AtlasX` | 86400 segundos |
 | **transbordo** | `Transbordo - AtlasX` | **Sem redirecionamento automático** |
@@ -125,16 +72,17 @@ O nome de cada serviço deve ser preenchido exatamente conforme a lista abaixo p
 | **cascataValidacao** | `Cascata de Validacao - AtlasX` | 86400 segundos |
 | **finalizacao** | `Finalizacao - AtlasX` | 86400 segundos |
 
-> **Nota importante:** O serviço `transbordo` deve ser configurado obrigatoriamente sem o redirecionamento automático para preservar a integridade da fila de atendimento humano.
+---
 
-Após concluir todas as configurações acima, você pode testar a jornada completa do Atlas seguindo estes passos:
+## 🧪 Cenários de Teste
+O projeto foi validado através de **19 cenários críticos**, garantindo a cobertura de:
+* [cite_start]Fluxos de sucesso em Cadastro e Consulta[cite: 32, 68].
+* [cite_start]Tratamento de documentos inválidos e clientes não encontrados[cite: 25, 42].
+* [cite_start]Recuperação de erros de API e inatividade[cite: 51, 56].
+* [cite_start]Transbordo humano com pesquisa de satisfação pós-atendimento[cite: 103].
 
-No menu superior do seu Router - AtlasX, acesse a aba Canais.
+[cite_start]*O detalhamento completo pode ser encontrado no arquivo `Cenários de Teste.docx` na pasta `/docs` [cite: 1-104].*
 
-Clique em Blip Chat.
-
-Vá até a aba Instalação.
-
-Clique no link embutido na frase: "Seu chatbot está disponível aqui".
-
-Interaja com o bot para validar os fluxos de Boas-Vindas, Identificação, Consulta/Cadastro e Transbordo.
+## 🚀 Como Testar
+1. No **Router - AtlasX**, acesse **Canais** -> **Blip Chat**.
+2. Na aba **Instalação**, clique no link em: *"Seu chatbot está disponível aqui"*.
