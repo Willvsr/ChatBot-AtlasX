@@ -1,0 +1,665 @@
+let BreakLine = '\n';
+
+function getMenuForPlatform(menuFormat) {
+    let menu = menuFormat;
+    if (typeof menuFormat === typeof toString()) {
+        menu = JSON.parse(menuFormat);
+    }
+
+    let platform = menu.menuScope.platform;
+    let boldValue = menu.menuScope.boldValue;
+    let menuScope = menu.menuScope;
+
+    let definePlatform = '';
+
+    switch (platform) {
+        case 'whatsapp':
+            definePlatform = defineTypeWhatsApp(menuScope, menu, boldValue);
+            break;
+
+        case 'messenger':
+            definePlatform = defineTypeBlipChat(menuScope, menu, boldValue);
+            break;
+
+        default:
+            definePlatform = defineTypeBlipChat(menuScope, menu, boldValue);
+            break;
+    }
+
+    let content_card = new Object();
+
+    content_card.content = definePlatform;
+    content_card.type = getTypeContentDinamic(platform, menuScope);
+
+    return content_card;
+}
+
+function getTypeContentDinamic(platform, menu) {
+    if (platform == 'whatsapp') {
+        if (
+            menu.whatsappButton
+            ||
+            menu.whatsappList
+            ||
+            menu.whatsappTemplate
+            ||
+            menu.whatsappStaticComponents
+            ||
+            menu.whatsappLocale
+            ||
+            menu.whatsappLinkButton
+            ||
+            menu.whatsappContactMenu
+        ) {
+            return 'application/json';
+        }
+
+        return 'application/vnd.lime.select+json';
+    } else {
+        if (menu.blipStaticComponents) {
+            return 'application/vnd.lime.media-link+json'
+        }
+
+        if (menu.blipchatCarroselTemplate) {
+            return 'application/vnd.lime.collection+json'
+        }
+
+        if (menu.blipchatMenuLink) {
+            return 'application/json'
+        }
+
+        if (menu.blipchatButtonLink) {
+            return 'application/vnd.lime.document-select+json'
+        }
+
+        return 'application/vnd.lime.select+json';
+    }
+}
+
+function returnFormatMenu(menuScope) {
+    let platform = menuScope.platform;
+
+    if (menuScope.whatsappButton == true && platform == 'whatsapp') {
+        return 'whatsappButton';
+    }
+
+    if (menuScope.whatsappList == true && platform == 'whatsapp') {
+        return 'whatsappList';
+    }
+
+    if (menuScope.whatsappTemplate == true && platform == 'whatsapp') {
+        return 'whatsappTemplate';
+    }
+
+    if (menuScope.whatsappStaticComponents == true && platform == 'whatsapp') {
+        return 'whatsappStaticComponents';
+    }
+
+    if (menuScope.whatsappLocale == true && platform == 'whatsapp') {
+        return 'whatsappLocale';
+    }
+
+    if (menuScope.whatsappLinkButton == true && platform == 'whatsapp') {
+        return 'whatsappLinkButton';
+    }
+
+    if (menuScope.whatsappContactMenu == true && platform == 'whatsapp') {
+        return 'whatsappContactMenu';
+    }
+
+    if (menuScope.blipchatQuickReply == true && platform == 'blipchat') {
+        return 'blipchatQuickReply';
+    }
+
+    if (menuScope.blipchatMenu == true && platform == 'blipchat') {
+        return 'blipchatMenu';
+    }
+
+    if (menuScope.blipchatMenuLink == true && platform == 'blipchat') {
+        return 'blipchatMenuLink';
+    }
+
+    if (menuScope.blipStaticComponents == true && platform == 'blipchat') {
+        return 'blipStaticComponents';
+    }
+
+    if (menuScope.blipchatCarroselTemplate == true && platform == 'blipchat') {
+        return 'blipchatCarroselTemplate';
+    }
+
+    if (menuScope.blipchatButtonLink == true && platform == 'blipchat') {
+        return 'blipchatButtonLink';
+    }
+
+    if (menuScope.defaultText == true && platform == 'whatsapp' || platform == 'blipchat') {
+        return 'defaultText';
+    }
+}
+
+function defineTypeWhatsApp(menuScope, Menu, boldValue) {
+    let returnMenu = '';
+    let typeMenu = returnFormatMenu(menuScope);
+
+    switch (typeMenu) {
+        case 'whatsappButton':
+            returnMenu = getWhatsApp3Botoes(Menu);
+            break;
+
+        case 'whatsappList':
+            returnMenu = getWhatsAppOpcoes(Menu);
+            break;
+
+        case 'whatsappTemplate':
+            returnMenu = getTemplateZap(Menu);
+            break;
+
+        case 'whatsappStaticComponents':
+            returnMenu = getWhatsappStaticComponents(Menu);
+            break;
+
+        case 'whatsappLocale':
+            returnMenu = getWhatsappLocaleComponent(Menu);
+            break;
+
+        case 'whatsappLinkButton':
+            returnMenu = getWhatsappLinkButton(Menu);
+            break;
+
+        case 'whatsappContactMenu':
+            returnMenu = getWhatsAppContactMenu(Menu);
+            break;
+
+        default:
+            returnMenu = getTextMenu(Menu, boldValue);
+            break;
+    }
+
+    return returnMenu;
+}
+
+function defineTypeBlipChat(menuScope, Menu, boldValue) {
+    let returnMenu = '';
+    let typeMenu = returnFormatMenu(menuScope);
+
+    switch (typeMenu) {
+        case 'blipchatQuickReply':
+            returnMenu = getQuickReply(Menu);
+            break;
+
+        case 'blipchatMenu':
+            returnMenu = getMenu(Menu);
+            break;
+
+        case 'blipStaticComponents':
+            returnMenu = getStaticBlipMenu(Menu)
+            break
+
+        case 'blipchatCarroselTemplate':
+            returnMenu = getBlipchatCarroselTemplate(Menu)
+            break
+
+        case 'blipchatMenuLink':
+            returnMenu = getWhatsappLinkButton(Menu)
+            break
+
+        case 'blipchatButtonLink':
+            returnMenu = getBlipchatButtonLink(Menu)
+            break
+
+        default:
+            returnMenu = getTextMenu(Menu, boldValue);
+            break;
+    }
+
+    return returnMenu;
+}
+
+function getStaticBlipMenu(Menu) {
+    const { header, body } = Menu
+
+    const { headerType, content } = header
+    const { uri, fileName } = content
+
+    let menuType
+
+    switch (headerType) {
+        case "document":
+            menuType = "application/pdf"
+            break
+
+        case "image":
+            menuType = "image/png"
+            break
+    }
+
+    return {
+        "type": menuType,
+        ...(headerType === 'image' && ({ "aspectRatio": "1:1" })),
+        "uri": uri,
+        "title": fileName,
+        ...(headerType === 'image' && ({ "text": body })),
+    }
+}
+
+function getTextMenu(menu, boldValue) {
+    let menuText = '';
+    if (menu.text) {
+        menuText += menu.text + BreakLine + BreakLine;
+    }
+    for (let i = 0; i < menu.options.length; i++) {
+        if (typeof menu.options[i] === typeof {}) {
+            menuText += menu.options[i].isBreakLine ? BreakLine : '';
+            menuText +=
+                boldValue.open +
+                menu.options[i].option +
+                '.' +
+                boldValue.close +
+                ' ' +
+                menu.options[i].text +
+                BreakLine;
+        } else {
+            menuText +=
+                boldValue.open +
+                (i + 1) +
+                '.' +
+                boldValue.close +
+                ' ' +
+                menu.options[i] +
+                BreakLine;
+        }
+    }
+    return { text: menuText };
+}
+
+function getMenu(Menu) {
+    const menuOptions = [];
+    if (Menu.values) {
+        for (let i = 0; i < Menu.options.length; i++) {
+            menuOptions.push({
+                "order": i + 1,
+                "text": Menu.options[i],
+                "type": 'text/plain',
+                "value": Menu.values[i],
+            });
+        }
+    } else {
+        for (let i = 0; i < Menu.options.length; i++) {
+            menuOptions.push({
+                "order": i + 1,
+                "text": Menu.options[i],
+                "type": 'text/plain',
+                "value": Menu.options[i],
+            });
+        }
+    }
+    return {
+        "scope": 'persistent',
+        "text": Menu.text,
+        "options": menuOptions,
+    };
+}
+
+function getQuickReply(Menu) {
+    const menuOptions = [];
+    if (Menu.values) {
+        for (let i = 0; i < Menu.options.length; i++) {
+            menuOptions.push({
+                "text": Menu.options[i],
+                "type": 'text/plain',
+                "value": Menu.values[i],
+            });
+        }
+    } else {
+        for (let i = 0; i < Menu.options.length; i++) {
+            menuOptions.push({
+                "text": Menu.options[i],
+                "type": 'text/plain',
+                "value": Menu.options[i],
+            });
+        }
+    }
+    return {
+        "scope": 'immediate',
+        "text": Menu.text,
+        "options": menuOptions,
+    };
+}
+
+function getBlipchatCarroselTemplate(Menu) {
+    const { carroselPayload, options, values } = Menu
+
+    const { cards, page } = carroselPayload
+
+    const LIMIT_PAGE = Math.ceil(cards.length / 10)
+
+    const cardsPerPage = cards.splice((page - 1) * 10, 10)
+
+    switch (true) {
+        case (cards.length <= 10):
+            break
+
+        case (page === 1):
+            options.push('Ver mais')
+            values.push('Ver mais')
+            break
+
+        case (page < LIMIT_PAGE):
+            options.push('Ver mais', 'Voltar')
+            values.push('Ver mais', 'Voltar')
+            break
+
+        case (page === LIMIT_PAGE):
+            options.push('Voltar')
+            values.push('Voltar')
+            break
+    }
+
+    const mappedCards = cardsPerPage.map(({ id, title, description, image }) => {
+        return {
+            "header": {
+                "type": "application/vnd.lime.media-link+json",
+                "value": {
+                    "type": "image/jpeg",
+                    "aspectRatio": "2:1",
+                    "uri": image,
+                    "title": title,
+                    "text": description
+                }
+            },
+            "options": options.map((option) => {
+                const isAdditionalOption = ['Ver mais', 'Voltar'].includes(option)
+
+                const value = !isAdditionalOption ? `${option}: ID: ${id} - Nome: ${title}` : option
+
+                return {
+                    "label": {
+                        "type": "text/plain",
+                        "value": option,
+                    },
+                    // payload para inserir ids dinâmicos
+                    "value": {
+                        "type": "text/plain",
+                        "value": value
+                    }
+                }
+            })
+        }
+    })
+
+    return {
+        "itemType": "application/vnd.lime.document-select+json",
+        "items": mappedCards
+    }
+}
+
+function getWhatsApp3Botoes(Menu) {
+    const { header } = Menu
+
+    const headerDetails = {
+        isActive: false
+    }
+
+    if (header) {
+        const { headerType, text, link } = header
+
+        switch (headerType) {
+            case "image":
+                headerDetails["isActive"] = true
+                headerDetails["content"] = {
+                    "type": headerType,
+                    text,
+                    image: {
+                        link
+                    }
+                }
+                break
+        }
+    }
+
+    const menuOptions = [];
+    for (let i = 0; i < Menu.options.length; i++) {
+        menuOptions.push({
+            "type": 'reply',
+            "reply": {
+                "id": String(i + 1),
+                "title": Menu.options[i],
+            },
+        });
+    }
+    return {
+        "recipient_type": 'individual',
+        "type": 'interactive',
+        "interactive": {
+            "type": 'button',
+            ...(headerDetails["isActive"] && { header: headerDetails["content"] }),
+            "body": {
+                "text": Menu.body,
+            },
+            "action": {
+                "buttons": menuOptions,
+            },
+        },
+    };
+}
+
+function getWhatsAppOpcoes(Menu) {
+    const menuOptions = [];
+    if (Menu.description.length > 0) {
+        for (let i = 0; i < Menu.options.length; i++) {
+            menuOptions.push({
+                "id": String(i + 1),
+                "title": Menu.options[i],
+                "description": Menu.description[i],
+            });
+        }
+    } else {
+        for (let i = 0; i < Menu.options.length; i++) {
+            menuOptions.push({
+                "id": String(i + 1),
+                "title": Menu.options[i],
+            });
+        }
+    }
+    return {
+        "recipient_type": 'individual',
+        "type": 'interactive',
+        "interactive": {
+            "type": 'list',
+            "body": {
+                "text": Menu.body,
+            },
+            "action": {
+                "button": Menu.button,
+                "sections": [
+                    {
+                        "title": Menu.title,
+                        "rows": menuOptions,
+                    },
+                ],
+            },
+        },
+    };
+}
+
+function getTemplateZap(Menu) {
+    const { payloadTemplate } = Menu
+    let { name, templateType, components, constructor } = payloadTemplate
+
+    if (!components || !Object.keys(components).length) {
+        components = null
+    }
+
+    return {
+        "type": 'template',
+        "template": {
+            "name": name,
+            "language": {
+                "policy": 'deterministic',
+                "code": 'pt_BR',
+            },
+            ...(components && { components: constructor.componentsGenerate(components) })
+        },
+    };
+}
+
+function getWhatsappStaticComponents(Menu) {
+    const { header, body } = Menu
+
+    if (!header) {
+        return {
+            "recipient_type": "individual",
+            "type": "text",
+            "text": {
+                "body": "Olá!\nPara construir mensagens estáticas no Whatsapp você deve informar o tipo do conteúdo e suas respectivas caracterísitcas.\n\nQualquer dúvida entre em contato com o desenvolvedor responsável pelo script."
+            }
+        }
+    }
+
+    const { headerType, content } = header
+    const { uri, fileName } = content
+
+    const staticDataDetails = {}
+
+    switch (headerType) {
+        case "document":
+            staticDataDetails["document"] = {
+                "link": uri,
+                "filename": fileName,
+                "caption": body
+            }
+            break
+
+        case "image":
+            staticDataDetails["image"] = {
+                "link": uri,
+                "caption": body
+            }
+            break
+
+        default:
+            staticDataDetails["text"] = {
+                "body": "Olá!\nPara construir mensagens estáticas no Whatsapp você deve informar o tipo do conteúdo e suas respectivas caracterísitcas.\n\nQualquer dúvida entre em contato com o desenvolvedor responsável pelo script."
+            }
+    }
+
+    return {
+        "recipient_type": "individual",
+        "type": headerType,
+        ...staticDataDetails
+    }
+}
+
+function getWhatsappLocaleComponent(Menu) {
+    const { text } = Menu
+
+    return {
+        "recipient_type": "individual",
+        "type": "interactive",
+        "interactive": {
+            "type": "location_request_message",
+            "body": {
+                "text": text
+            },
+            "action": {
+                "name": "send_location"
+            }
+        }
+    }
+}
+
+function getWhatsappLinkButton(Menu) {
+    const { text, button, options } = Menu
+
+    const [url] = options
+
+    return {
+        "recipient_type": "individual",
+        "type": "interactive",
+        "interactive": {
+            "type": "cta_url",
+            "body": {
+                "text": text
+            },
+            "action": {
+                "name": "cta_url",
+                "parameters": {
+                    "display_text": button,
+                    "url": url
+                }
+            }
+        }
+    }
+}
+
+function getWhatsAppContactMenu(Menu) {
+    const { payloadContact } = Menu
+
+    const {name, phone, company} = payloadContact
+
+    return {
+        "type": "contacts",
+        "contacts": [
+            {
+                "name": {
+                    "first_name": name,
+                    "formatted_name": name,
+                    "last_name": name
+                },
+                "org": {
+                    "company": company,
+                    "department": "",
+                    "title": ""
+                },
+                "phones": [
+                    {
+                        "phone": phone,
+                        "type": "WORK"
+                    }
+                ]
+            }
+        ]
+    }
+}
+
+function getBlipchatButtonLink(Menu) {
+    const { header, buttonsLink } = Menu
+
+    const options = buttonsLink.map(({ type, text, payload }) => {
+        let buttonPayload = {
+            'label': {
+                'type': '',
+                'value': {
+                    'text': ''
+                }
+            }
+        }
+
+        switch (type) {
+            case 'contact':
+                buttonPayload['label']['type'] = 'application/x-action-call-phone+json'
+                buttonPayload['label']['value']['text'] = text
+                buttonPayload['label']['value']['phoneNumber'] = payload
+                break
+
+            case 'url':
+                buttonPayload['label']['type'] = 'application/vnd.lime.web-link+json'
+                buttonPayload['label']['value']['text'] = text
+                buttonPayload['label']['value']['uri'] = payload
+                break
+
+            default:
+                buttonPayload['label']['type'] = 'text/plain'
+                buttonPayload['label']['value']['text'] = payload
+        }
+
+        return buttonPayload
+    })
+
+    return {
+        'header': {
+            'type': 'text/plain',
+            'value': header
+        },
+        'options': options
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "router": {
+        "http": "Sua routerKey http aqui",
+        "sdk": "Sua routerKey sdk aqui"
+    },
+    "service": {
+        "http": "Sua ServiceKey http aqui",
+        "sdk": "Sua ServiceKey sdk aqui"
+    },
+    "connectionUrl": "Sua commands Url aqui"
+}

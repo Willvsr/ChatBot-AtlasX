@@ -1,0 +1,65 @@
+{
+    "Default": {
+        "holidays": [
+            "01/01",
+            "21/04",
+            "01/05",
+            "07/09",
+            "12/10",
+            "02/11",
+            "15/11",
+            "25/12"
+        ],
+        "workDays": [
+            {
+                "id": "0",
+                "day": "Domingo",
+                "active": false,
+                "start": "00:00",
+                "end": "00:00"
+            },
+            {
+                "id": "1",
+                "day": "Segunda-feira",
+                "active": true,
+                "start": "08:00",
+                "end": "17:00"
+            },
+            {
+                "id": "2",
+                "day": "Terça-feira",
+                "active": true,
+                "start": "08:00",
+                "end": "17:00"
+            },
+            {
+                "id": "3",
+                "day": "Quarta-feira",
+                "active": true,
+                "start": "08:00",
+                "end": "17:00"
+            },
+            {
+                "id": "4",
+                "day": "Quinta-feira",
+                "active": true,
+                "start": "08:00",
+                "end": "17:00"
+            },
+            {
+                "id": "5",
+                "day": "Sexta-feira",
+                "active": true,
+                "start": "08:00",
+                "end": "17:00"
+            },
+            {
+                "id": "6",
+                "day": "Sábado",
+                "active": false,
+                "start": "00:00",
+                "end": "00:00"
+            }
+        ]
+    }
+}
